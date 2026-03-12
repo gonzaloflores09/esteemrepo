@@ -107,4 +107,15 @@ body {
     width:450px;
     opacity:0.9;
     pointer-events:none;
+
+}
+@media (max-width: 768px){
+    .esteem-logo{
+        width:22vw;
+        max-width:110px;
+        min-width:75px;
+        right:10px;
+        bottom:10px;
+        opacity:0.85;
+    }
 }
