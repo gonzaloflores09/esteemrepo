@@ -58,10 +58,14 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     };
 
-    viewer.addEventListener("load", () => {
-        console.log("MODELO CARGADO");
-        hideIntro();
-    });
+   viewer.addEventListener("load", () => {
+    console.log("MODELO CARGADO");
+    hideIntro();
+
+    setTimeout(() => {
+        spinBoatOnce();
+    }, 1200);
+});
 
     viewer.addEventListener("error", (e) => {
         console.log("ERROR CARGANDO MODELO", e);
@@ -80,7 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
     id="boat"
     src="Z1_WEB_V5.glb"
     alt="boat"
-    shadow-intensity="2.5"
+    shadow-intensity="1.5"
     exposure="0.6"
     shadow-softness="0.8"
     camera-controls
@@ -88,6 +92,37 @@ window.addEventListener("DOMContentLoaded", () => {
     style="width:100vw; height:100vh;"
   >
   </model-viewer>
+  <script>
+function spinBoatOnce() {
+    const viewer = document.querySelector("#boat");
+
+    const startAngle = 90;
+    const endAngle = 450; // 90 + 360
+    const vertical = 75;
+    const radius = "3m";
+    const duration = 2500; // 2,5 segundos
+
+    const startTime = performance.now();
+
+    function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // easing suave
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const angle = startAngle + (endAngle - startAngle) * eased;
+
+        viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+</script>
 
   <script>
     console.log("SCRIPT CARGADO");
@@ -242,4 +277,5 @@ window.addEventListener("DOMContentLoaded", () => {
   <div class="noise"></div>
 </body>
 </html>
+
 
