@@ -6,46 +6,76 @@
   <title>Esteem</title>
   <link rel="icon" type="image/png" href="esteem_icon.png.png" />
   <link rel="stylesheet" href="style.css" />
-
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="top-logo-container">
-    <img src="esteem_logo.png" class="top-logo" />
+    <img src="esteem_logo.png" class="top-logo" alt="Esteem logo" />
   </div>
 
   <div id="intro">
     <div class="intro-overlay">
-      <img src="esteem_logo.png" class="intro-logo" />
+      <img src="esteem_logo.png" class="intro-logo" alt="Esteem intro logo" />
     </div>
   </div>
 
-  <div class="panel">
-    <div class="section">
-      <h2 class="section-title">COLOR EXTERIOR</h2>
-      <div class="colors">
-        <button class="swatch exterior-swatch black active" onclick="setHull(this, '#0b0b0b')"></button>
-        <button class="swatch exterior-swatch grey" onclick="setHull(this, '#141414')"></button>
-        <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
-        <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
-      </div>
-    </div>
+  <div id="sidebar" class="sidebar">
+    <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Expandir o contraer panel">
+      <span class="toggle-icon">‹</span>
+    </button>
 
-    <div class="section">
-      <div class="section-title">COLOR INTERIOR</div>
-      <div class="colors">
-        <button class="swatch interior-swatch black active" onclick="setInterior(this, '#101010')"></button>
-        <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f')"></button>
-        <button class="swatch interior-swatch white" onclick="setInterior(this, '#f1f1f1')"></button>
-        <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
-      </div>
-    </div>
+    <div class="sidebar-inner">
+      <div class="panel">
+        <div class="section">
+          <h2 class="section-title">COLOR EXTERIOR</h2>
+          <div class="colors">
+            <button class="swatch exterior-swatch black active" onclick="setHull(this, '#0b0b0b')"></button>
+            <button class="swatch exterior-swatch grey" onclick="setHull(this, '#141414')"></button>
+            <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
+            <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
+          </div>
+        </div>
 
-    <div class="section">
-      <div class="section-title">WAKE TOWER</div>
-      <div class="toggle-group">
-        <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
-        <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
+        <div class="section">
+          <div class="section-title">COLOR INTERIOR</div>
+          <div class="colors">
+            <button class="swatch interior-swatch black active" onclick="setInterior(this, '#101010')"></button>
+            <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f')"></button>
+            <button class="swatch interior-swatch white" onclick="setInterior(this, '#f1f1f1')"></button>
+            <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">WAKE TOWER</div>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
+            <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-panel">
+        <div class="action-block">
+          <div class="action-title">GUARDAR CONFIGURACIÓN</div>
+          <button id="copyBtn" class="action-btn" onclick="copyConfigLink()">
+            COPIAR LINK
+          </button>
+        </div>
+
+        <div class="action-block">
+          <div class="action-title">SOLICITAR COTIZACIÓN</div>
+          <button class="action-btn primary" onclick="openQuoteModal()">
+            SOLICITAR
+          </button>
+        </div>
+
+        <div class="action-block">
+          <div class="action-title">DESCARGAR IMAGEN</div>
+          <button class="action-btn" onclick="captureBoatImage()">
+            CAPTURAR DISEÑO
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -61,31 +91,7 @@
     camera-orbit="90deg 75deg 3m"
     max-camera-orbit="auto 87deg auto"
     style="width:100vw; height:100vh;"
-  >
-  </model-viewer>
-  <div class="ui-separator"></div> 
-  <div class="action-panel">
-    <div class="action-block">
-      <div class="action-title">GUARDAR CONFIGURACIÓN</div>
-      <button id="copyBtn" class="action-btn" onclick="copyConfigLink()">
-        COPIAR LINK
-      </button>
-    </div>
-
-    <div class="action-block">
-      <div class="action-title">SOLICITAR COTIZACIÓN</div>
-      <button class="action-btn primary" onclick="openQuoteModal()">
-        SOLICITAR
-      </button>
-    </div>
-    <div class="action-block">
-      <div class="action-title">DESCARGAR IMAGEN</div>
-      <button class="action-btn" onclick="captureBoatImage()">
-        CAPTURAR DISEÑO
-      </button>
-    </div>
-    </div>
-  </div>
+  ></model-viewer>
 
   <div id="quoteModal" class="quote-modal">
     <div class="quote-box">
@@ -109,10 +115,17 @@
     </div>
   </div>
 
+  <div id="colorFade"></div>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
   <script>
     let currentHullColor = "#0b0b0b";
     let currentInteriorColor = "#101010";
     let currentWakeState = true;
+    let nudgeFrame = null;
 
     function updateConfigURL() {
       const params = new URLSearchParams();
@@ -183,7 +196,6 @@
           });
 
           const result = await response.json();
-          console.log("Formspree response:", result);
 
           if (response.ok) {
             form.reset();
@@ -203,6 +215,13 @@
       });
     }
 
+    function hexToRgbFactor(color) {
+      const r = parseInt(color.substring(1, 3), 16) / 255;
+      const g = parseInt(color.substring(3, 5), 16) / 255;
+      const b = parseInt(color.substring(5, 7), 16) / 255;
+      return [r, g, b, 1];
+    }
+
     function changeHull(color) {
       const viewer = document.querySelector("#boat");
       if (!viewer.model) return;
@@ -212,26 +231,9 @@
       );
       if (!hullMaterial) return;
 
-      const r = parseInt(color.substring(1, 3), 16) / 255;
-      const g = parseInt(color.substring(3, 5), 16) / 255;
-      const b = parseInt(color.substring(5, 7), 16) / 255;
-
-      hullMaterial.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+      hullMaterial.pbrMetallicRoughness.setBaseColorFactor(hexToRgbFactor(color));
     }
-function animateColorChange(color, applyFunction){
-  const fade = document.getElementById("colorFade");
 
-  fade.style.background = "#000";
-  fade.style.opacity = "0.20";
-
-  setTimeout(() => {
-    applyFunction(color);
-  }, 150);
-
-  setTimeout(() => {
-    fade.style.opacity = "0";
-  }, 600);
-}
     function changeInterior(color) {
       const viewer = document.querySelector("#boat");
       if (!viewer.model) return;
@@ -246,13 +248,26 @@ function animateColorChange(color, applyFunction){
         m => m.name === "Phong_414141_r0.90"
       );
 
-      const r = parseInt(color.substring(1, 3), 16) / 255;
-      const g = parseInt(color.substring(3, 5), 16) / 255;
-      const b = parseInt(color.substring(5, 7), 16) / 255;
+      const rgba = hexToRgbFactor(color);
 
-      if (interior1) interior1.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-      if (interior2) interior2.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-      if (interior3) interior3.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+      if (interior1) interior1.pbrMetallicRoughness.setBaseColorFactor(rgba);
+      if (interior2) interior2.pbrMetallicRoughness.setBaseColorFactor(rgba);
+      if (interior3) interior3.pbrMetallicRoughness.setBaseColorFactor(rgba);
+    }
+
+    function animateColorChange(color, applyFunction) {
+      const fade = document.getElementById("colorFade");
+
+      fade.style.background = "#000";
+      fade.style.opacity = "0.20";
+
+      setTimeout(() => {
+        applyFunction(color);
+      }, 150);
+
+      setTimeout(() => {
+        fade.style.opacity = "0";
+      }, 600);
     }
 
     function applyWakeMaterial(material, show) {
@@ -302,21 +317,65 @@ function animateColorChange(color, applyFunction){
       applyWakeMaterial(wake3, state);
     }
 
-    function setHull(button, color){
+function nudgeBoat() {
+  const viewer = document.querySelector("#boat");
+  if (!viewer) return;
 
-  document.querySelectorAll(".exterior-swatch").forEach(btn=>{
-    btn.classList.remove("active");
-  });
+  if (nudgeFrame) {
+    cancelAnimationFrame(nudgeFrame);
+    nudgeFrame = null;
+  }
 
-  button.classList.add("active");
+  const orbit = viewer.getCameraOrbit();
+  const startTheta = Number(orbit.theta);
+  const fixedPhi = orbit.phi.toString();
+  const fixedRadius = orbit.radius.toString();
 
-  currentHullColor = color;
+  const nudgeRadians = 5 * Math.PI / 180;
+  const peakTheta = startTheta + nudgeRadians;
+  const endTheta = startTheta;
+  const duration = 520;
 
-  animateColorChange(color, changeHull);
-  nudgeBoat();
+  const startTime = performance.now();
 
-  updateConfigURL();
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    let theta;
+    if (progress < 0.5) {
+      const p = progress / 0.5;
+      theta = startTheta + (peakTheta - startTheta) * (1 - Math.pow(1 - p, 3));
+    } else {
+      const p = (progress - 0.5) / 0.5;
+      theta = peakTheta + (endTheta - peakTheta) * (1 - Math.pow(1 - p, 3));
+    }
+
+    viewer.cameraOrbit = `${theta}rad ${fixedPhi} ${fixedRadius}`;
+
+    if (progress < 1) {
+      nudgeFrame = requestAnimationFrame(animate);
+    } else {
+      viewer.cameraOrbit = `${endTheta}rad ${fixedPhi} ${fixedRadius}`;
+      nudgeFrame = null;
+    }
+  }
+
+  nudgeFrame = requestAnimationFrame(animate);
 }
+
+    function setHull(button, color) {
+      document.querySelectorAll(".exterior-swatch").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      currentHullColor = color;
+
+      animateColorChange(color, changeHull);
+      nudgeBoat();
+      updateConfigURL();
+    }
 
     function setInterior(button, color) {
       document.querySelectorAll(".interior-swatch").forEach(btn => {
@@ -325,6 +384,7 @@ function animateColorChange(color, applyFunction){
 
       button.classList.add("active");
       currentInteriorColor = color;
+
       animateColorChange(color, changeInterior);
       nudgeBoat();
       updateConfigURL();
@@ -345,9 +405,7 @@ function animateColorChange(color, applyFunction){
       }
 
       currentWakeState = state;
-      animateColorChange("000", () => {  
-
-      })
+      animateColorChange("#000", () => {});
       nudgeBoat();
       updateConfigURL();
     }
@@ -395,41 +453,7 @@ function animateColorChange(color, applyFunction){
       const duration = 2500;
 
       const startTime = performance.now();
-      function nudgeBoat() {
-  const viewer = document.querySelector("#boat");
-  if (!viewer) return;
 
-  const startAngle = 90;
-  const peakAngle = 180;   // gira un poquito
-  const endAngle = 90;
-  const vertical = 75;
-  const radius = "3m";
-  const duration = 700;
-
-  const startTime = performance.now();
-
-  function animate(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-
-    let angle;
-    if (progress < 0.5) {
-      const p = progress / 0.5;
-      angle = startAngle + (peakAngle - startAngle) * (1 - Math.pow(1 - p, 3));
-    } else {
-      const p = (progress - 0.5) / 0.5;
-      angle = peakAngle + (endAngle - peakAngle) * (1 - Math.pow(1 - p, 3));
-    }
-
-    viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
       function animate(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -446,36 +470,45 @@ function animateColorChange(color, applyFunction){
       requestAnimationFrame(animate);
     }
 
- async function captureBoatImage() {
-  const viewer = document.querySelector("#boat");
+    async function captureBoatImage() {
+      const viewer = document.querySelector("#boat");
 
-  if (!viewer || !viewer.model) {
-    alert("El modelo todavía no terminó de cargar");
-    return;
-  }
+      if (!viewer || !viewer.model) {
+        alert("El modelo todavía no terminó de cargar");
+        return;
+      }
 
-  try {
-    // reaplicar configuración actual
-    changeHull(currentHullColor);
-    changeInterior(currentInteriorColor);
-    toggleWake(currentWakeState);
+      try {
+        changeHull(currentHullColor);
+        changeInterior(currentInteriorColor);
+        toggleWake(currentWakeState);
 
-    // esperar a que renderice el estado actual
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    await new Promise(resolve => setTimeout(resolve, 180));
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        await new Promise(resolve => setTimeout(resolve, 180));
 
-    const imageURL = viewer.toDataURL("image/png");
+        const imageURL = viewer.toDataURL("image/png");
 
-    const link = document.createElement("a");
-    link.href = imageURL;
-    link.download = "esteem-configuracion.png";
-    link.click();
-  } catch (error) {
-    console.error("Error capturando imagen:", error);
-    alert("No se pudo capturar la imagen");
-  }
-}
+        const link = document.createElement("a");
+        link.href = imageURL;
+        link.download = "esteem-configuracion.png";
+        link.click();
+      } catch (error) {
+        console.error("Error capturando imagen:", error);
+        alert("No se pudo capturar la imagen");
+      }
+    }
+
+    function setupSidebarToggle() {
+      const sidebar = document.getElementById("sidebar");
+      const toggle = document.getElementById("sidebarToggle");
+
+      if (!sidebar || !toggle) return;
+
+      toggle.addEventListener("click", () => {
+        sidebar.classList.toggle("collapsed");
+      });
+    }
 
     window.addEventListener("DOMContentLoaded", () => {
       const viewer = document.querySelector("#boat");
@@ -485,6 +518,7 @@ function animateColorChange(color, applyFunction){
 
       loadConfigFromURL();
       setupQuoteForm();
+      setupSidebarToggle();
 
       const hideIntro = () => {
         const introOverlay = document.querySelector(".intro-overlay");
@@ -523,15 +557,5 @@ function animateColorChange(color, applyFunction){
       }, 5000);
     });
   </script>
-
-  <script
-    type="module"
-    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
-  ></script>
-  <div id="colorFade"></div>
-  <div class="vignette"></div>
-  <div class="noise"></div>
-  <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
-<button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
 </body>
-</html>
+</html>>
