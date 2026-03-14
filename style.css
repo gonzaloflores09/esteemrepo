@@ -175,7 +175,7 @@ body {
     pointer-events:none;
 }
 @media (max-width: 768px){
-    .esteem-logo{
+    .top-logo{
         width:22vw;
         max-width:110px;
         min-width:75px;
