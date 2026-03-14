@@ -86,12 +86,12 @@ body {
 }
 .black{
     background:#0b0b0b;
-    --swatch-color:#0b0b0b;
+    --swatch-color:#f1f1f1;
 }
 
 .grey{
     background:#3f3f3f;
-    --swatch-color:#3f3f3f;
+    --swatch-color:#686868;
 }
 
 .white{
