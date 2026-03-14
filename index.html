@@ -1,29 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Esteem</title>
-  <link rel="icon" type="image/png" href="esteem_icon.png.png">
+  <link rel="icon" type="image/png" href="esteem_icon.png.png" />
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .copy-success{
+      background:#2ecc71 !important;
+      border-color:#2ecc71 !important;
+      color:white !important;
+    }
+
+    .quote-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:9999999;
+      padding:20px;
+    }
+
+    .quote-modal.open{
+      display:flex;
+    }
+
+    .quote-box{
+      position:relative;
+      width:100%;
+      max-width:420px;
+      background:rgba(20,20,20,0.92);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:22px;
+      padding:26px 22px 22px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    .quote-box h3{
+      margin:0 0 18px 0;
+      color:white;
+      font-size:14px;
+      letter-spacing:3px;
+      font-weight:700;
+      font-family:Arial, sans-serif;
+    }
+
+    #quoteForm{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    #quoteForm input,
+    #quoteForm textarea{
+      width:100%;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:14px;
+      padding:12px 14px;
+      color:white;
+      font-size:13px;
+      font-family:Arial, sans-serif;
+      outline:none;
+      box-sizing:border-box;
+    }
+
+    #quoteForm textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+
+    #quoteForm input::placeholder,
+    #quoteForm textarea::placeholder{
+      color:rgba(255,255,255,0.55);
+    }
+
+    .quote-close{
+      position:absolute;
+      top:10px;
+      right:12px;
+      background:none;
+      border:none;
+      color:white;
+      font-size:24px;
+      cursor:pointer;
+      opacity:0.75;
+    }
+
+    .quote-close:hover{
+      opacity:1;
+    }
+
+    .quote-success{
+      display:none;
+      margin-top:14px;
+      color:#2ecc71;
+      font-size:13px;
+      letter-spacing:1px;
+      font-family:Arial, sans-serif;
+    }
+
+    .quote-success.show{
+      display:block;
+    }
+  </style>
 </head>
 <body>
   <div class="top-logo-container">
-    <img src="esteem_logo.png" class="top-logo">
-</div>
+    <img src="esteem_logo.png" class="top-logo" />
+  </div>
+
   <div id="intro">
     <div class="intro-overlay">
-        <img src="esteem_logo.png" class="intro-logo">
+      <img src="esteem_logo.png" class="intro-logo" />
     </div>
-</div>
+  </div>
+
   <div class="panel">
     <div class="section">
       <h2 class="section-title">COLOR EXTERIOR</h2>
       <div class="colors">
-       <button class="swatch exterior-swatch black active" onclick="setHull(this, '#0b0b0b')"></button>
-      <button class="swatch exterior-swatch grey" onclick="setHull(this, '#141414')"></button>
-      <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
-      <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
+        <button class="swatch exterior-swatch black active" onclick="setHull(this, '#0b0b0b')"></button>
+        <button class="swatch exterior-swatch grey" onclick="setHull(this, '#141414')"></button>
+        <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
+        <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
       </div>
     </div>
 
@@ -40,60 +146,30 @@
     <div class="section">
       <div class="section-title">WAKE TOWER</div>
       <div class="toggle-group">
-        <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">ON</button>
-        <button class="toggle-btn" id="wake-off" onclick="setWake(false)">OFF</button>
+        <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
+        <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">GUARDAR CONFIGURACIÓN</div>
+      <div class="toggle-group">
+        <button id="copyBtn" class="toggle-btn" onclick="copyConfigLink()">COPIAR LINK</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">SOLICITAR COTIZACIÓN</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" onclick="openQuoteModal()">SOLICITAR</button>
       </div>
     </div>
   </div>
-  <script>
-window.addEventListener("DOMContentLoaded", () => {
-    const viewer = document.querySelector("#boat");
-    const intro = document.querySelector("#intro");
-
-    if (!viewer || !intro) return;
-
-    const hideIntro = () => {
-    const introOverlay = document.querySelector(".intro-overlay");
-
-    if (introOverlay) {
-        introOverlay.style.transition = "opacity 3.5s ease-in-out";
-        introOverlay.style.opacity = "0";
-    }
-
-    intro.style.transition = "opacity 2.5s ease-in-out";
-    intro.style.opacity = "0";
-
-    setTimeout(() => {
-        intro.style.display = "none";
-    }, 3500);
-};
-
-   viewer.addEventListener("load", () => {
-    console.log("MODELO CARGADO");
-    hideIntro();
-
-    setTimeout(() => {
-        spinBoatOnce();
-    }, 1200);
-});
-
-    viewer.addEventListener("error", (e) => {
-        console.log("ERROR CARGANDO MODELO", e);
-    });
-
-    setTimeout(() => {
-        if (intro.style.display !== "none") {
-            console.log("Fallback: ocultando intro");
-            hideIntro();
-        }
-    }, 5000);
-});
-</script>
 
   <model-viewer
     id="boat"
     src="Z1_WEB_V5.glb"
-    alt="boat"
+    alt="Lancha"
     shadow-intensity="1.5"
     exposure="0.6"
     shadow-softness="0.8"
@@ -102,74 +178,162 @@ window.addEventListener("DOMContentLoaded", () => {
     style="width:100vw; height:100vh;"
   >
   </model-viewer>
+
+  <div id="quoteModal" class="quote-modal">
+    <div class="quote-box">
+      <button class="quote-close" onclick="closeQuoteModal()">×</button>
+      <h3>SOLICITAR COTIZACIÓN</h3>
+
+      <form id="quoteForm" action="https://formspree.io/f/mlgplpwn" method="POST">
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="email" placeholder="Tu email" required>
+        <textarea name="mensaje" placeholder="Mensaje (opcional)"></textarea>
+        <input type="hidden" name="color_exterior" id="quoteExterior">
+        <input type="hidden" name="color_interior" id="quoteInterior">
+        <input type="hidden" name="wake_tower" id="quoteWake">
+        <input type="hidden" name="link_configuracion" id="quoteConfigLink">
+
+        <button type="submit" class="toggle-btn">ENVIAR SOLICITUD</button>
+      </form>
+
+      <div id="quoteSuccess" class="quote-success">✓ Solicitud enviada</div>
+    </div>
+  </div>
+
   <script>
-    function setHull(button, color) {
-  document.querySelectorAll(".exterior-swatch").forEach(btn => {
-    btn.classList.remove("active");
-  });
+    let currentHullColor = "#0b0b0b";
+    let currentInteriorColor = "#101010";
+    let currentWakeState = true;
+    function setupQuoteForm() {
+  const form = document.getElementById("quoteForm");
+  const success = document.getElementById("quoteSuccess");
 
-  button.classList.add("active");
-  changeHull(color);
-}
+  if (!form) return;
 
-function setInterior(button, color) {
-  document.querySelectorAll(".interior-swatch").forEach(btn => {
-    btn.classList.remove("active");
-  });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  button.classList.add("active");
-  changeInterior(color);
-}
-function spinBoatOnce() {
-    const viewer = document.querySelector("#boat");
+    const data = new FormData(form);
 
-    const startAngle = 90;
-    const endAngle = 320; // 90 + 360
-    const vertical = 75;
-    const radius = "3m";
-    const duration = 2500; // 2,5 segundos
-
-    const startTime = performance.now();
-
-    function animate(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // easing suave
-        const eased = 1 - Math.pow(1 - progress, 3);
-
-        const angle = startAngle + (endAngle - startAngle) * eased;
-
-        viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
-
-        if (progress < 1) {
-            requestAnimationFrame(animate);
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: data,
+        headers: {
+          "Accept": "application/json"
         }
+      });
+
+      const result = await response.json();
+      console.log("Formspree response:", result);
+
+      if (response.ok) {
+        form.reset();
+        success.classList.add("show");
+
+        setTimeout(() => {
+          success.classList.remove("show");
+          closeQuoteModal();
+        }, 1800);
+      } else {
+        alert(result?.errors?.[0]?.message || "No se pudo enviar la solicitud");
+      }
+    } catch (error) {
+      console.error("Error enviando formulario:", error);
+      alert("Error de conexión al enviar la solicitud");
+    }
+  });
+}
+
+    function updateConfigURL() {
+      const params = new URLSearchParams();
+      params.set("exterior", currentHullColor.replace("#", ""));
+      params.set("interior", currentInteriorColor.replace("#", ""));
+      params.set("wake", currentWakeState ? "on" : "off");
+
+      const newURL = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newURL);
     }
 
-    requestAnimationFrame(animate);
-}
-</script>
+    function loadConfigFromURL() {
+      const params = new URLSearchParams(window.location.search);
 
-  <script>
-    console.log("SCRIPT CARGADO");
+      const exterior = params.get("exterior");
+      const interior = params.get("interior");
+      const wake = params.get("wake");
+
+      if (exterior) currentHullColor = `#${exterior}`;
+      if (interior) currentInteriorColor = `#${interior}`;
+      if (wake) currentWakeState = wake === "on";
+    }
+
+    function copyConfigLink() {
+      navigator.clipboard.writeText(window.location.href);
+
+      const btn = document.getElementById("copyBtn");
+      btn.innerHTML = "✓ LINK COPIADO";
+      btn.classList.add("copy-success");
+
+      setTimeout(() => {
+        btn.innerHTML = "COPIAR LINK";
+        btn.classList.remove("copy-success");
+      }, 2000);
+    }
+
+    function openQuoteModal() {
+      document.getElementById("quoteExterior").value = currentHullColor;
+      document.getElementById("quoteInterior").value = currentInteriorColor;
+      document.getElementById("quoteWake").value = currentWakeState ? "ON" : "OFF";
+      document.getElementById("quoteConfigLink").value = window.location.href;
+
+      document.getElementById("quoteModal").classList.add("open");
+    }
+
+    function closeQuoteModal() {
+      document.getElementById("quoteModal").classList.remove("open");
+    }
+
+    function setupQuoteForm() {
+      const form = document.getElementById("quoteForm");
+      const success = document.getElementById("quoteSuccess");
+
+      if (!form) return;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const data = new FormData(form);
+
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: data,
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (response.ok) {
+          form.reset();
+          success.classList.add("show");
+
+          setTimeout(() => {
+            success.classList.remove("show");
+            closeQuoteModal();
+          }, 1800);
+        } else {
+          alert("No se pudo enviar la solicitud");
+        }
+      });
+    }
 
     function changeHull(color) {
       const viewer = document.querySelector("#boat");
-
-      if (!viewer.model) {
-        alert("El modelo todavía no terminó de cargar");
-        return;
-      }
+      if (!viewer.model) return;
 
       const hullMaterial = viewer.model.materials.find(
         m => m.name === "Material.004"
       );
-
-      if (!hullMaterial) {
-        alert("No encontré el material Material.004");
-        return;
-      }
+      if (!hullMaterial) return;
 
       const r = parseInt(color.substring(1, 3), 16) / 255;
       const g = parseInt(color.substring(3, 5), 16) / 255;
@@ -180,20 +344,14 @@ function spinBoatOnce() {
 
     function changeInterior(color) {
       const viewer = document.querySelector("#boat");
-
-      if (!viewer.model) {
-        alert("El modelo todavía no terminó de cargar");
-        return;
-      }
+      if (!viewer.model) return;
 
       const interior1 = viewer.model.materials.find(
         m => m.name === "Phong_737373_r0.90"
       );
-
       const interior2 = viewer.model.materials.find(
         m => m.name === "Standard_3A3A3A"
       );
-
       const interior3 = viewer.model.materials.find(
         m => m.name === "Phong_414141_r0.90"
       );
@@ -202,23 +360,13 @@ function spinBoatOnce() {
       const g = parseInt(color.substring(3, 5), 16) / 255;
       const b = parseInt(color.substring(5, 7), 16) / 255;
 
-      if (interior1) {
-        interior1.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-      }
-
-      if (interior2) {
-        interior2.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-      }
-
-      if (interior3) {
-        interior3.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-      }
+      if (interior1) interior1.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+      if (interior2) interior2.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+      if (interior3) interior3.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
     }
 
     function applyWakeMaterial(material, show) {
       if (!material) return;
-
-      console.log("Aplicando wake a:", material.name, "show:", show);
 
       const c = material.pbrMetallicRoughness.baseColorFactor;
 
@@ -229,12 +377,7 @@ function spinBoatOnce() {
           material.alphaMode = "OPAQUE";
         }
 
-        material.pbrMetallicRoughness.setBaseColorFactor([
-          c[0],
-          c[1],
-          c[2],
-          1
-        ]);
+        material.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], 1]);
       } else {
         if (typeof material.setAlphaMode === "function") {
           material.setAlphaMode("MASK");
@@ -246,31 +389,20 @@ function spinBoatOnce() {
           material.alphaCutoff = 0.5;
         }
 
-        material.pbrMetallicRoughness.setBaseColorFactor([
-          c[0],
-          c[1],
-          c[2],
-          0
-        ]);
+        material.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], 0]);
       }
     }
 
     function toggleWake(state) {
       const viewer = document.querySelector("#boat");
-
-      if (!viewer.model) {
-        alert("El modelo todavía no terminó de cargar");
-        return;
-      }
+      if (!viewer.model) return;
 
       const wake1 = viewer.model.materials.find(
         m => m.name === "Standard_373737"
       );
-
       const wake2 = viewer.model.materials.find(
         m => m.name === "Material.005"
       );
-
       const wake3 = viewer.model.materials.find(
         m => m.name === "Material.006"
       );
@@ -278,6 +410,28 @@ function spinBoatOnce() {
       applyWakeMaterial(wake1, state);
       applyWakeMaterial(wake2, state);
       applyWakeMaterial(wake3, state);
+    }
+
+    function setHull(button, color) {
+      document.querySelectorAll(".exterior-swatch").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      currentHullColor = color;
+      changeHull(color);
+      updateConfigURL();
+    }
+
+    function setInterior(button, color) {
+      document.querySelectorAll(".interior-swatch").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      currentInteriorColor = color;
+      changeInterior(color);
+      updateConfigURL();
     }
 
     function setWake(state) {
@@ -293,13 +447,123 @@ function spinBoatOnce() {
         offBtn.classList.add("active");
         onBtn.classList.remove("active");
       }
+
+      currentWakeState = state;
+      updateConfigURL();
     }
+
+    function applySavedConfig() {
+      changeHull(currentHullColor);
+      changeInterior(currentInteriorColor);
+      toggleWake(currentWakeState);
+
+      document.querySelectorAll(".exterior-swatch").forEach(btn => {
+        btn.classList.remove("active");
+        const onclickText = btn.getAttribute("onclick");
+        if (onclickText && onclickText.includes(currentHullColor)) {
+          btn.classList.add("active");
+        }
+      });
+
+      document.querySelectorAll(".interior-swatch").forEach(btn => {
+        btn.classList.remove("active");
+        const onclickText = btn.getAttribute("onclick");
+        if (onclickText && onclickText.includes(currentInteriorColor)) {
+          btn.classList.add("active");
+        }
+      });
+
+      const onBtn = document.querySelector("#wake-on");
+      const offBtn = document.querySelector("#wake-off");
+
+      if (currentWakeState) {
+        onBtn.classList.add("active");
+        offBtn.classList.remove("active");
+      } else {
+        offBtn.classList.add("active");
+        onBtn.classList.remove("active");
+      }
+    }
+
+    function spinBoatOnce() {
+      const viewer = document.querySelector("#boat");
+
+      const startAngle = 90;
+      const endAngle = 320;
+      const vertical = 75;
+      const radius = "3m";
+      const duration = 2500;
+
+      const startTime = performance.now();
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const angle = startAngle + (endAngle - startAngle) * eased;
+        viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const viewer = document.querySelector("#boat");
+      const intro = document.querySelector("#intro");
+
+      if (!viewer || !intro) return;
+
+      loadConfigFromURL();
+      setupQuoteForm();
+
+      const hideIntro = () => {
+        const introOverlay = document.querySelector(".intro-overlay");
+
+        if (introOverlay) {
+          introOverlay.style.transition = "opacity 3.5s ease-in-out";
+          introOverlay.style.opacity = "0";
+        }
+
+        intro.style.transition = "opacity 2.5s ease-in-out";
+        intro.style.opacity = "0";
+
+        setTimeout(() => {
+          intro.style.display = "none";
+        }, 3500);
+      };
+
+      viewer.addEventListener("load", () => {
+        applySavedConfig();
+        hideIntro();
+
+        setTimeout(() => {
+          spinBoatOnce();
+        }, 1200);
+      });
+
+      viewer.addEventListener("error", (e) => {
+        console.log("ERROR CARGANDO MODELO", e);
+      });
+
+      setTimeout(() => {
+        if (intro.style.display !== "none") {
+          applySavedConfig();
+          hideIntro();
+        }
+      }, 5000);
+    });
   </script>
 
   <script
     type="module"
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
   ></script>
+
   <div class="vignette"></div>
   <div class="noise"></div>
 </body>
