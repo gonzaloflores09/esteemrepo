@@ -248,7 +248,21 @@ model-viewer {
 
     z-index:20;
 }
+.vignette{
+    position:fixed;
+    inset:0;
 
+    pointer-events:none;
+
+   background:radial-gradient(
+   ellipse at center,
+ rgba(0,0,0,0) 35%,
+ rgba(0,0,0,0.35) 70%,
+ rgba(0,0,0,0.6) 100%
+   );
+
+    z-index:999998;
+}
 .top-logo{
     width:150px;
     opacity:0.9;
@@ -267,5 +281,3 @@ model-viewer {
         width:120px;
     }
 }
-
-
