@@ -7,109 +7,7 @@
   <link rel="icon" type="image/png" href="esteem_icon.png.png" />
   <link rel="stylesheet" href="style.css" />
 
-  <style>
-    .copy-success{
-      background:#2ecc71 !important;
-      border-color:#2ecc71 !important;
-      color:white !important;
-    }
-
-    .quote-modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.55);
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      z-index:9999999;
-      padding:20px;
-    }
-
-    .quote-modal.open{
-      display:flex;
-    }
-
-    .quote-box{
-      position:relative;
-      width:100%;
-      max-width:420px;
-      background:rgba(20,20,20,0.92);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:22px;
-      padding:26px 22px 22px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.45);
-    }
-
-    .quote-box h3{
-      margin:0 0 18px 0;
-      color:white;
-      font-size:14px;
-      letter-spacing:3px;
-      font-weight:700;
-      font-family:Arial, sans-serif;
-    }
-
-    #quoteForm{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    #quoteForm input,
-    #quoteForm textarea{
-      width:100%;
-      background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:14px;
-      padding:12px 14px;
-      color:white;
-      font-size:13px;
-      font-family:Arial, sans-serif;
-      outline:none;
-      box-sizing:border-box;
-    }
-
-    #quoteForm textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    #quoteForm input::placeholder,
-    #quoteForm textarea::placeholder{
-      color:rgba(255,255,255,0.55);
-    }
-
-    .quote-close{
-      position:absolute;
-      top:10px;
-      right:12px;
-      background:none;
-      border:none;
-      color:white;
-      font-size:24px;
-      cursor:pointer;
-      opacity:0.75;
-    }
-
-    .quote-close:hover{
-      opacity:1;
-    }
-
-    .quote-success{
-      display:none;
-      margin-top:14px;
-      color:#2ecc71;
-      font-size:13px;
-      letter-spacing:1px;
-      font-family:Arial, sans-serif;
-    }
-
-    .quote-success.show{
-      display:block;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="top-logo-container">
@@ -150,20 +48,6 @@
         <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
       </div>
     </div>
-
-    <div class="section">
-      <div class="section-title">GUARDAR CONFIGURACIÓN</div>
-      <div class="toggle-group">
-        <button id="copyBtn" class="toggle-btn" onclick="copyConfigLink()">COPIAR LINK</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">SOLICITAR COTIZACIÓN</div>
-      <div class="toggle-group">
-        <button class="toggle-btn" onclick="openQuoteModal()">SOLICITAR</button>
-      </div>
-    </div>
   </div>
 
   <model-viewer
@@ -175,9 +59,33 @@
     shadow-softness="0.8"
     camera-controls
     camera-orbit="90deg 75deg 3m"
+    max-camera-orbit="auto 87deg auto"
     style="width:100vw; height:100vh;"
   >
   </model-viewer>
+  <div class="ui-separator"></div> 
+  <div class="action-panel">
+    <div class="action-block">
+      <div class="action-title">GUARDAR CONFIGURACIÓN</div>
+      <button id="copyBtn" class="action-btn" onclick="copyConfigLink()">
+        COPIAR LINK
+      </button>
+    </div>
+
+    <div class="action-block">
+      <div class="action-title">SOLICITAR COTIZACIÓN</div>
+      <button class="action-btn primary" onclick="openQuoteModal()">
+        SOLICITAR
+      </button>
+    </div>
+    <div class="action-block">
+      <div class="action-title">DESCARGAR IMAGEN</div>
+      <button class="action-btn" onclick="captureBoatImage()">
+        CAPTURAR DISEÑO
+      </button>
+    </div>
+    </div>
+  </div>
 
   <div id="quoteModal" class="quote-modal">
     <div class="quote-box">
@@ -188,6 +96,7 @@
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="email" name="email" placeholder="Tu email" required>
         <textarea name="mensaje" placeholder="Mensaje (opcional)"></textarea>
+
         <input type="hidden" name="color_exterior" id="quoteExterior">
         <input type="hidden" name="color_interior" id="quoteInterior">
         <input type="hidden" name="wake_tower" id="quoteWake">
@@ -204,46 +113,6 @@
     let currentHullColor = "#0b0b0b";
     let currentInteriorColor = "#101010";
     let currentWakeState = true;
-    function setupQuoteForm() {
-  const form = document.getElementById("quoteForm");
-  const success = document.getElementById("quoteSuccess");
-
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = new FormData(form);
-
-    try {
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: data,
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-      const result = await response.json();
-      console.log("Formspree response:", result);
-
-      if (response.ok) {
-        form.reset();
-        success.classList.add("show");
-
-        setTimeout(() => {
-          success.classList.remove("show");
-          closeQuoteModal();
-        }, 1800);
-      } else {
-        alert(result?.errors?.[0]?.message || "No se pudo enviar la solicitud");
-      }
-    } catch (error) {
-      console.error("Error enviando formulario:", error);
-      alert("Error de conexión al enviar la solicitud");
-    }
-  });
-}
 
     function updateConfigURL() {
       const params = new URLSearchParams();
@@ -304,24 +173,32 @@
 
         const data = new FormData(form);
 
-        const response = await fetch(form.action, {
-          method: "POST",
-          body: data,
-          headers: {
-            "Accept": "application/json"
+        try {
+          const response = await fetch(form.action, {
+            method: "POST",
+            body: data,
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          const result = await response.json();
+          console.log("Formspree response:", result);
+
+          if (response.ok) {
+            form.reset();
+            success.classList.add("show");
+
+            setTimeout(() => {
+              success.classList.remove("show");
+              closeQuoteModal();
+            }, 1800);
+          } else {
+            alert(result?.errors?.[0]?.message || "No se pudo enviar la solicitud");
           }
-        });
-
-        if (response.ok) {
-          form.reset();
-          success.classList.add("show");
-
-          setTimeout(() => {
-            success.classList.remove("show");
-            closeQuoteModal();
-          }, 1800);
-        } else {
-          alert("No se pudo enviar la solicitud");
+        } catch (error) {
+          console.error("Error enviando formulario:", error);
+          alert("Error de conexión al enviar la solicitud");
         }
       });
     }
@@ -341,7 +218,20 @@
 
       hullMaterial.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
     }
+function animateColorChange(color, applyFunction){
+  const fade = document.getElementById("colorFade");
 
+  fade.style.background = "#000";
+  fade.style.opacity = "0.20";
+
+  setTimeout(() => {
+    applyFunction(color);
+  }, 150);
+
+  setTimeout(() => {
+    fade.style.opacity = "0";
+  }, 600);
+}
     function changeInterior(color) {
       const viewer = document.querySelector("#boat");
       if (!viewer.model) return;
@@ -412,16 +302,21 @@
       applyWakeMaterial(wake3, state);
     }
 
-    function setHull(button, color) {
-      document.querySelectorAll(".exterior-swatch").forEach(btn => {
-        btn.classList.remove("active");
-      });
+    function setHull(button, color){
 
-      button.classList.add("active");
-      currentHullColor = color;
-      changeHull(color);
-      updateConfigURL();
-    }
+  document.querySelectorAll(".exterior-swatch").forEach(btn=>{
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+  currentHullColor = color;
+
+  animateColorChange(color, changeHull);
+  nudgeBoat();
+
+  updateConfigURL();
+}
 
     function setInterior(button, color) {
       document.querySelectorAll(".interior-swatch").forEach(btn => {
@@ -430,7 +325,8 @@
 
       button.classList.add("active");
       currentInteriorColor = color;
-      changeInterior(color);
+      animateColorChange(color, changeInterior);
+      nudgeBoat();
       updateConfigURL();
     }
 
@@ -449,6 +345,10 @@
       }
 
       currentWakeState = state;
+      animateColorChange("000", () => {  
+
+      })
+      nudgeBoat();
       updateConfigURL();
     }
 
@@ -489,13 +389,47 @@
       const viewer = document.querySelector("#boat");
 
       const startAngle = 90;
-      const endAngle = 320;
+      const endAngle = 330;
       const vertical = 75;
       const radius = "3m";
       const duration = 2500;
 
       const startTime = performance.now();
+      function nudgeBoat() {
+  const viewer = document.querySelector("#boat");
+  if (!viewer) return;
 
+  const startAngle = 90;
+  const peakAngle = 180;   // gira un poquito
+  const endAngle = 90;
+  const vertical = 75;
+  const radius = "3m";
+  const duration = 700;
+
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    let angle;
+    if (progress < 0.5) {
+      const p = progress / 0.5;
+      angle = startAngle + (peakAngle - startAngle) * (1 - Math.pow(1 - p, 3));
+    } else {
+      const p = (progress - 0.5) / 0.5;
+      angle = peakAngle + (endAngle - peakAngle) * (1 - Math.pow(1 - p, 3));
+    }
+
+    viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
       function animate(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -511,6 +445,37 @@
 
       requestAnimationFrame(animate);
     }
+
+ async function captureBoatImage() {
+  const viewer = document.querySelector("#boat");
+
+  if (!viewer || !viewer.model) {
+    alert("El modelo todavía no terminó de cargar");
+    return;
+  }
+
+  try {
+    // reaplicar configuración actual
+    changeHull(currentHullColor);
+    changeInterior(currentInteriorColor);
+    toggleWake(currentWakeState);
+
+    // esperar a que renderice el estado actual
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => setTimeout(resolve, 180));
+
+    const imageURL = viewer.toDataURL("image/png");
+
+    const link = document.createElement("a");
+    link.href = imageURL;
+    link.download = "esteem-configuracion.png";
+    link.click();
+  } catch (error) {
+    console.error("Error capturando imagen:", error);
+    alert("No se pudo capturar la imagen");
+  }
+}
 
     window.addEventListener("DOMContentLoaded", () => {
       const viewer = document.querySelector("#boat");
@@ -563,8 +528,10 @@
     type="module"
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
   ></script>
-
+  <div id="colorFade"></div>
   <div class="vignette"></div>
   <div class="noise"></div>
+  <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
+<button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
 </body>
 </html>
